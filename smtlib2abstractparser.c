@@ -75,6 +75,7 @@ void smtlib2_abstract_parser_init(smtlib2_abstract_parser *p,
     pi->set_info = smtlib2_abstract_parser_set_info;
     pi->get_assignment = smtlib2_abstract_parser_get_assignment;
     pi->get_value = smtlib2_abstract_parser_get_value;
+    pi->get_model = smtlib2_abstract_parser_get_model;
     pi->exit = smtlib2_abstract_parser_exit;
     pi->handle_error = smtlib2_abstract_parser_handle_error;
     pi->push_let_scope = smtlib2_abstract_parser_push_let_scope;
@@ -372,6 +373,14 @@ void smtlib2_abstract_parser_get_assignment(smtlib2_parser_interface *p)
 
 void smtlib2_abstract_parser_get_value(smtlib2_parser_interface *p,
                                        smtlib2_vector *terms)
+{
+    smtlib2_abstract_parser *pp = (smtlib2_abstract_parser *)p;
+    pp->response_ = SMTLIB2_RESPONSE_ERROR;
+    pp->errmsg_ = smtlib2_strdup("unimplemented");
+}
+
+
+void smtlib2_abstract_parser_get_model(smtlib2_parser_interface *p)
 {
     smtlib2_abstract_parser *pp = (smtlib2_abstract_parser *)p;
     pp->response_ = SMTLIB2_RESPONSE_ERROR;

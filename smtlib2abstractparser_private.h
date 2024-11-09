@@ -126,6 +126,7 @@ void smtlib2_abstract_parser_set_info(smtlib2_parser_interface *p,
 void smtlib2_abstract_parser_get_assignment(smtlib2_parser_interface *p);
 void smtlib2_abstract_parser_get_value(smtlib2_parser_interface *p,
                                        smtlib2_vector *terms);
+void smtlib2_abstract_parser_get_model(smtlib2_parser_interface *p);
 void smtlib2_abstract_parser_exit(smtlib2_parser_interface *p);
 
 void smtlib2_abstract_parser_set_internal_parsed_terms(

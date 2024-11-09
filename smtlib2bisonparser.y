@@ -192,6 +192,7 @@ command :
 | cmd_set_info
 | cmd_get_assignment
 | cmd_get_value
+| cmd_get_model
 | cmd_exit
 | cmd_internal_parse_terms
 | cmd_error
@@ -424,6 +425,11 @@ cmd_get_value : '(' TK_GET_VALUE '(' verbatim_term_list ')' ')'
   }
 ;
 
+cmd_get_model : '(' TK_GET_MODEL ')'
+   {
+      parser->get_model(parser);
+   }
+;
 
 cmd_exit : '(' TK_EXIT ')'
   {

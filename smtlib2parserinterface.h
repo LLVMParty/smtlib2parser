@@ -182,6 +182,11 @@ struct smtlib2_parser_interface {
     void (*get_value)(smtlib2_parser_interface *parser, smtlib2_vector *terms);
 
     /**
+     * callback for a "get-model" command
+     */
+    void (*get_model)(smtlib2_parser_interface *parser);
+
+    /**
      * callback for a "exit" command
      */
     void (*exit)(smtlib2_parser_interface *parser);
