@@ -1,0 +1,41 @@
+# Reference: https://build-cpp.github.io/cmkr/cmake-toml
+[project]
+name = "smtlib2parser"
+
+[target.smtlib2parser]
+type = "library"
+sources = [
+    "smtlib2abstractparser.c",
+    "smtlib2bisonparser.c",
+    "smtlib2charbuf.c",
+    "smtlib2flexlexer.c",
+    "smtlib2hashtable.c",
+    "smtlib2scanner.c",
+    "smtlib2stream.c",
+    "smtlib2termparser.c",
+    "smtlib2utils.c",
+    "smtlib2vector.c",
+]
+headers = [
+    "smtlib2abstractparser.h",
+    "smtlib2abstractparser_private.h",
+    "smtlib2bisonparser.h",
+    "smtlib2charbuf.h",
+    "smtlib2flexlexer.h",
+    "smtlib2genvector.h",
+    "smtlib2hashtable.h",
+    "smtlib2parser.h",
+    "smtlib2parserinterface.h",
+    "smtlib2scanner.h",
+    "smtlib2stream.h",
+    "smtlib2termparser.h",
+    "smtlib2types.h",
+    "smtlib2utils.h",
+    "smtlib2vector.h",
+]
+
+[target.test]
+type = "executable"
+sources = [
+    "test.c"
+]
