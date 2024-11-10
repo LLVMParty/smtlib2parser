@@ -61,7 +61,8 @@ struct smtlib2_abstract_parser {
     smtlib2_response response_;
     bool print_success_;
 
-    char *errmsg_;
+    char *pvt_errmsg_;
+    smtlib2_vector *errors_;
     smtlib2_vector *response_data_;
 
     smtlib2_status status_;
@@ -173,5 +174,6 @@ smtlib2_sort smtlib2_abstract_parser_make_function_sort(
 
 void smtlib2_abstract_parser_print_response(smtlib2_abstract_parser *p);
 void smtlib2_abstract_parser_reset_response(smtlib2_abstract_parser *p);
+void smtlib2_abstract_parser_set_error(smtlib2_abstract_parser *p, const char *fmt, ...);
 
 #endif /* SMTLIB2ABSTRACTPARSER_PRIVATE_H_INCLUDED */

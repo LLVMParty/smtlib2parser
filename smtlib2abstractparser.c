@@ -42,7 +42,7 @@ void smtlib2_abstract_parser_init(smtlib2_abstract_parser *p,
     p->errstream_ = stderr;
     p->response_ = SMTLIB2_RESPONSE_SUCCESS;
     p->print_success_ = true;
-    p->errmsg_ = NULL;
+    p->pvt_errmsg_ = NULL;
     p->response_data_ = smtlib2_vector_new();
     p->status_ = SMTLIB2_STATUS_UNKNOWN;
     p->set_logic_ok_ = true;
@@ -137,8 +137,7 @@ void smtlib2_abstract_parser_set_logic(smtlib2_parser_interface *p,
     if (pp->set_logic_ok_) {
         pp->set_logic_ok_ = false;
     } else {
-        pp->response_ = SMTLIB2_RESPONSE_ERROR;
-        pp->errmsg_ = smtlib2_strdup("set-logic can't be called at this point");
+        smtlib2_abstract_parser_set_error(pp, "set-logic can't be called at this point");
     }
 }
 
@@ -148,8 +147,7 @@ void smtlib2_abstract_parser_declare_sort(smtlib2_parser_interface *p,
                                           int arity)
 {
     smtlib2_abstract_parser *pp = (smtlib2_abstract_parser *)p;
-    pp->response_ = SMTLIB2_RESPONSE_ERROR;
-    pp->errmsg_ = smtlib2_strdup("unimplemented (declare-sort)");
+    smtlib2_abstract_parser_set_error(pp, "unimplemented (declare-sort)");
 }
 
 
@@ -159,8 +157,7 @@ void smtlib2_abstract_parser_define_sort(smtlib2_parser_interface *p,
                                          smtlib2_sort sort)
 {
     smtlib2_abstract_parser *pp = (smtlib2_abstract_parser *)p;
-    pp->response_ = SMTLIB2_RESPONSE_ERROR;
-    pp->errmsg_ = smtlib2_strdup("unimplemented (define-sort)");
+    smtlib2_abstract_parser_set_error(pp, "unimplemented (define-sort)");
 }
 
 
@@ -181,8 +178,7 @@ void smtlib2_abstract_parser_declare_function(smtlib2_parser_interface *p,
                                               smtlib2_sort sort)
 {
     smtlib2_abstract_parser *pp = (smtlib2_abstract_parser *)p;
-    pp->response_ = SMTLIB2_RESPONSE_ERROR;
-    pp->errmsg_ = smtlib2_strdup("unimplemented (declare-function)");
+    smtlib2_abstract_parser_set_error(pp, "unimplemented (declare-function)");
 }
 
 
@@ -191,8 +187,7 @@ void smtlib2_abstract_parser_declare_variable(smtlib2_parser_interface *p,
                                               smtlib2_sort sort)
 {
     smtlib2_abstract_parser *pp = (smtlib2_abstract_parser *)p;
-    pp->response_ = SMTLIB2_RESPONSE_ERROR;
-    pp->errmsg_ = smtlib2_strdup("unimplemented (declare-variable)");
+    smtlib2_abstract_parser_set_error(pp, "unimplemented (declare-variable)");
 }
 
 
@@ -206,9 +201,7 @@ void smtlib2_abstract_parser_define_function(smtlib2_parser_interface *p,
     if (pp->response_ != SMTLIB2_RESPONSE_ERROR) {
         smtlib2_term_parser_define_binding(pp->termparser_, name, params, term);
         if (smtlib2_term_parser_error(pp->termparser_)) {
-            pp->response_ = SMTLIB2_RESPONSE_ERROR;
-            pp->errmsg_ = smtlib2_strdup(
-                smtlib2_term_parser_get_error_msg(pp->termparser_));
+            smtlib2_abstract_parser_set_error(pp, "%s", smtlib2_term_parser_get_error_msg(pp->termparser_));
         } else {
             pp->response_ = SMTLIB2_RESPONSE_SUCCESS;
         }
@@ -219,16 +212,14 @@ void smtlib2_abstract_parser_define_function(smtlib2_parser_interface *p,
 void smtlib2_abstract_parser_push(smtlib2_parser_interface *p, int n)
 {
     smtlib2_abstract_parser *pp = (smtlib2_abstract_parser *)p;
-    pp->response_ = SMTLIB2_RESPONSE_ERROR;
-    pp->errmsg_ = smtlib2_strdup("unimplemented (push)");
+    smtlib2_abstract_parser_set_error(pp, "unimplemented (push)");
 }
 
 
 void smtlib2_abstract_parser_pop(smtlib2_parser_interface *p, int n)
 {
     smtlib2_abstract_parser *pp = (smtlib2_abstract_parser *)p;
-    pp->response_ = SMTLIB2_RESPONSE_ERROR;
-    pp->errmsg_ = smtlib2_strdup("unimplemented (pop)");
+    smtlib2_abstract_parser_set_error(pp, "unimplemented (pop)");
 }
 
 
@@ -236,32 +227,28 @@ void smtlib2_abstract_parser_assert_formula(smtlib2_parser_interface *p,
                                             smtlib2_term term)
 {
     smtlib2_abstract_parser *pp = (smtlib2_abstract_parser *)p;
-    pp->response_ = SMTLIB2_RESPONSE_ERROR;
-    pp->errmsg_ = smtlib2_strdup("unimplemented (assert)");
+    smtlib2_abstract_parser_set_error(pp, "unimplemented (assert)");
 }
 
 
 void smtlib2_abstract_parser_check_sat(smtlib2_parser_interface *p)
 {
     smtlib2_abstract_parser *pp = (smtlib2_abstract_parser *)p;
-    pp->response_ = SMTLIB2_RESPONSE_ERROR;
-    pp->errmsg_ = smtlib2_strdup("unimplemented (check-sat)");
+    smtlib2_abstract_parser_set_error(pp, "unimplemented (check-sat)");
 }
 
 
 void smtlib2_abstract_parser_get_unsat_core(smtlib2_parser_interface *p)
 {
     smtlib2_abstract_parser *pp = (smtlib2_abstract_parser *)p;
-    pp->response_ = SMTLIB2_RESPONSE_ERROR;
-    pp->errmsg_ = smtlib2_strdup("unimplemented (get-unsat-core)");
+    smtlib2_abstract_parser_set_error(pp, "unimplemented (get-unsat-core)");
 }
 
 
 void smtlib2_abstract_parser_get_proof(smtlib2_parser_interface *p)
 {
     smtlib2_abstract_parser *pp = (smtlib2_abstract_parser *)p;
-    pp->response_ = SMTLIB2_RESPONSE_ERROR;
-    pp->errmsg_ = smtlib2_strdup("unimplemented (get-proof)");
+    smtlib2_abstract_parser_set_error(pp, "unimplemented (get-proof)");
 }
 
 
@@ -290,10 +277,7 @@ void smtlib2_abstract_parser_set_str_option(smtlib2_parser_interface *p,
             } else {
                 *which = fopen(value, "w");
                 if (!*which) {
-                    pp->response_ = SMTLIB2_RESPONSE_ERROR;
-                    pp->errmsg_ =
-                        smtlib2_sprintf("Impossible to open `%s' as `%s'",
-                                        value, keyword);
+                    smtlib2_abstract_parser_set_error(pp, "Impossible to open `%s' as `%s'", value, keyword);
                     if (strcmp(keyword, ":regular-output-channel") == 0) {
                         *which = stdout;
                     } else {
@@ -366,8 +350,7 @@ void smtlib2_abstract_parser_set_info(smtlib2_parser_interface *p,
 void smtlib2_abstract_parser_get_assignment(smtlib2_parser_interface *p)
 {
     smtlib2_abstract_parser *pp = (smtlib2_abstract_parser *)p;
-    pp->response_ = SMTLIB2_RESPONSE_ERROR;
-    pp->errmsg_ = smtlib2_strdup("unimplemented (get-assignment)");
+    smtlib2_abstract_parser_set_error(pp, "unimplemented (get-assignment)");
 }
 
 
@@ -375,16 +358,14 @@ void smtlib2_abstract_parser_get_value(smtlib2_parser_interface *p,
                                        smtlib2_vector *terms)
 {
     smtlib2_abstract_parser *pp = (smtlib2_abstract_parser *)p;
-    pp->response_ = SMTLIB2_RESPONSE_ERROR;
-    pp->errmsg_ = smtlib2_strdup("unimplemented (get-value)");
+    smtlib2_abstract_parser_set_error(pp, "unimplemented (get-value)");
 }
 
 
 void smtlib2_abstract_parser_get_model(smtlib2_parser_interface *p)
 {
     smtlib2_abstract_parser *pp = (smtlib2_abstract_parser *)p;
-    pp->response_ = SMTLIB2_RESPONSE_ERROR;
-    pp->errmsg_ = smtlib2_strdup("unimplemented (get-model)");
+    smtlib2_abstract_parser_set_error(pp, "unimplemented (get-model)");
 }
 
 
@@ -404,9 +385,7 @@ void smtlib2_abstract_parser_set_internal_parsed_terms(
         if (pp->internal_parsed_terms_enabled_) {
             smtlib2_vector_swap(pp->internal_parsed_terms_, terms);
         } else {
-            pp->response_ = SMTLIB2_RESPONSE_ERROR;
-            pp->errmsg_ =
-                smtlib2_strdup("unknown command `.internal-parse-terms'");
+            smtlib2_abstract_parser_set_error(pp, "unknown command `.internal-parse-terms'");
         }
     }
 }
@@ -416,9 +395,10 @@ void smtlib2_abstract_parser_set_internal_parsed_terms(
 void smtlib2_abstract_parser_handle_error(smtlib2_parser_interface *p,
                                           const char *msg)
 {
+    // TODO: refactor this to include the location of the error?
     smtlib2_abstract_parser *pp = (smtlib2_abstract_parser *)p;
-    pp->response_ = SMTLIB2_RESPONSE_ERROR;
-    pp->errmsg_ = smtlib2_strdup(msg);
+    smtlib2_abstract_parser_set_error(pp, "%s", msg);
+    printf("handle_error(%s)\n", msg);
 }
 
 
@@ -428,9 +408,7 @@ void smtlib2_abstract_parser_push_let_scope(smtlib2_parser_interface *p)
     if (pp->response_ != SMTLIB2_RESPONSE_ERROR) {
         smtlib2_term_parser_push_let_scope(pp->termparser_);
         if (smtlib2_term_parser_error(pp->termparser_)) {
-            pp->response_ = SMTLIB2_RESPONSE_ERROR;
-            pp->errmsg_ = smtlib2_strdup(
-                smtlib2_term_parser_get_error_msg(pp->termparser_));
+            smtlib2_abstract_parser_set_error(pp, "%s", smtlib2_term_parser_get_error_msg(pp->termparser_));
         }
     }
 }
@@ -442,9 +420,7 @@ smtlib2_term smtlib2_abstract_parser_pop_let_scope(smtlib2_parser_interface *p)
     if (pp->response_ != SMTLIB2_RESPONSE_ERROR) {
         smtlib2_term_parser_pop_let_scope(pp->termparser_);
         if (smtlib2_term_parser_error(pp->termparser_)) {
-            pp->response_ = SMTLIB2_RESPONSE_ERROR;
-            pp->errmsg_ = smtlib2_strdup(
-                smtlib2_term_parser_get_error_msg(pp->termparser_));
+            smtlib2_abstract_parser_set_error(pp, "%s", smtlib2_term_parser_get_error_msg(pp->termparser_));
         }
     }
     return NULL;
@@ -478,9 +454,7 @@ smtlib2_term smtlib2_abstract_parser_make_term(smtlib2_parser_interface *p,
         ret = smtlib2_term_parser_make_term(pp->termparser_, symbol, sort,
                                             index, args);
         if (smtlib2_term_parser_error(pp->termparser_)) {
-            pp->response_ = SMTLIB2_RESPONSE_ERROR;
-            pp->errmsg_ = smtlib2_strdup(
-                smtlib2_term_parser_get_error_msg(pp->termparser_));
+            smtlib2_abstract_parser_set_error(pp, "%s", smtlib2_term_parser_get_error_msg(pp->termparser_));
         }
     }
     return ret;
@@ -500,9 +474,7 @@ smtlib2_term smtlib2_abstract_parser_make_number_term(
         ret = smtlib2_term_parser_make_number_term(pp->termparser_,
                                                    numval, width, base);
         if (smtlib2_term_parser_error(pp->termparser_)) {
-            pp->response_ = SMTLIB2_RESPONSE_ERROR;
-            pp->errmsg_ = smtlib2_strdup(
-                smtlib2_term_parser_get_error_msg(pp->termparser_));
+            smtlib2_abstract_parser_set_error(pp, "%s", smtlib2_term_parser_get_error_msg(pp->termparser_));
         }
     }
     return ret;
@@ -527,9 +499,7 @@ void smtlib2_abstract_parser_define_let_binding(smtlib2_parser_interface *p,
     if (pp->response_ != SMTLIB2_RESPONSE_ERROR) {
         smtlib2_term_parser_define_let_binding(pp->termparser_, symbol, term);
         if (smtlib2_term_parser_error(pp->termparser_)) {
-            pp->response_ = SMTLIB2_RESPONSE_ERROR;
-            pp->errmsg_ = smtlib2_strdup(
-                smtlib2_term_parser_get_error_msg(pp->termparser_));
+            smtlib2_abstract_parser_set_error(pp, "%s", smtlib2_term_parser_get_error_msg(pp->termparser_));
         }
     }
 }
@@ -540,8 +510,7 @@ smtlib2_sort smtlib2_abstract_parser_make_sort(smtlib2_parser_interface *p,
                                                smtlib2_vector *index)
 {
     smtlib2_abstract_parser *pp = (smtlib2_abstract_parser *)p;
-    pp->response_ = SMTLIB2_RESPONSE_ERROR;
-    pp->errmsg_ = smtlib2_strdup("unimplemented (make-sort)");
+    smtlib2_abstract_parser_set_error(pp, "unimplemented (make-sort)");
     return NULL;
 }
 
@@ -552,8 +521,7 @@ smtlib2_sort smtlib2_abstract_parser_make_parametric_sort(
     smtlib2_vector *tps)
 {
     smtlib2_abstract_parser *pp = (smtlib2_abstract_parser *)p;
-    pp->response_ = SMTLIB2_RESPONSE_ERROR;
-    pp->errmsg_ = smtlib2_strdup("unimplemented (make-parametric-sort)");
+    smtlib2_abstract_parser_set_error(pp, "unimplemented (make-parametric-sort)");
     return NULL;
 }
 
@@ -563,8 +531,7 @@ smtlib2_sort smtlib2_abstract_parser_make_function_sort(
     smtlib2_vector *tps)
 {
     smtlib2_abstract_parser *pp = (smtlib2_abstract_parser *)p;
-    pp->response_ = SMTLIB2_RESPONSE_ERROR;
-    pp->errmsg_ = smtlib2_strdup("unimplemented (make-function-sort)");
+    smtlib2_abstract_parser_set_error(pp, "unimplemented (make-function-sort)");
     return NULL;
 }
 
@@ -578,7 +545,7 @@ void smtlib2_abstract_parser_print_response(smtlib2_abstract_parser *p)
         }
         break;
     case SMTLIB2_RESPONSE_ERROR:
-        fprintf(p->errstream_, "(error \"%s\")\n", p->errmsg_);
+        fprintf(p->errstream_, "(error \"%s\")\n", p->pvt_errmsg_);
         break;
     case SMTLIB2_RESPONSE_UNSUPPORTED:
         fprintf(p->outstream_, "unsupported\n");
@@ -636,9 +603,33 @@ void smtlib2_abstract_parser_print_response(smtlib2_abstract_parser *p)
 void smtlib2_abstract_parser_reset_response(smtlib2_abstract_parser *p)
 {
     p->response_ = SMTLIB2_RESPONSE_SUCCESS;
-    if (p->errmsg_) {
-        free(p->errmsg_);
-        p->errmsg_ = NULL;
+    if (p->pvt_errmsg_) {
+        free(p->pvt_errmsg_);
+        p->pvt_errmsg_ = NULL;
     }
     smtlib2_vector_clear(p->response_data_);
+}
+
+void smtlib2_abstract_parser_set_error(smtlib2_abstract_parser *p, const char *fmt, ...)
+{
+    va_list args;
+    char* ret;
+    va_start(args, fmt);
+    ret = smtlib2_vsprintf(fmt, args);
+    va_end(args);
+
+    // Append the error if one already exists
+    p->response_ = SMTLIB2_RESPONSE_ERROR;
+    if(p->pvt_errmsg_ != NULL) {
+        int len1 = strlen(p->pvt_errmsg_);
+        int len2 = strlen(ret);
+        char* tmp = (char*)malloc(len1 + len2 + 2);
+        memcpy(tmp, p->pvt_errmsg_, len1);
+        tmp[len1] = ';';
+        memcpy(tmp + len1 + 1, ret, len2 + 1);
+        free(p->pvt_errmsg_);
+        p->pvt_errmsg_  = tmp;
+    } else {
+        p->pvt_errmsg_ = ret;
+    }
 }
