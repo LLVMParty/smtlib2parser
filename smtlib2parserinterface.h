@@ -63,7 +63,7 @@ struct smtlib2_parser_interface {
                         smtlib2_sort sort);
 
     /**
-     * callback for a "declare-function" command
+     * callback for a "declare-fun" command
      */
     void (*declare_function)(smtlib2_parser_interface *parser,
                              const char *name, smtlib2_sort sort);
@@ -71,13 +71,13 @@ struct smtlib2_parser_interface {
     /**
      * callback for declaring a quantified variable
      * This gets called for variables declared by an "exists" or "forall"
-     * quantification, but also for parameters of a "define-function" command
+     * quantification, but also for parameters of a "define-fun" command
      */
     void (*declare_variable)(smtlib2_parser_interface *parser,
                              const char *name, smtlib2_sort sort);
 
     /**
-     * callback for a "define-function" command
+     * callback for a "define-fun" command
      * "params" is a vector of smtlib2_term returned by make_term (see below),
      *          declared by declare_variable (see above) in the current scope
      *          (see push_quantifier_scope below),
@@ -215,14 +215,14 @@ struct smtlib2_parser_interface {
 
     /**
      * push a scope for quantified variables. called every time an "exist" or
-     * "forall" is parsed, and also when a "define-function" with parameters
+     * "forall" is parsed, and also when a "define-fun" with parameters
      * is parsed
      */
     smtlib2_term (*push_quantifier_scope)(smtlib2_parser_interface *parser);
 
     /**
      * pop a scope for quantified variabled. called when the closing
-     * parenthesis for an "exists", "forall" or "define-function" is parsed
+     * parenthesis for an "exists", "forall" or "define-fun" is parsed
      */
     smtlib2_term (*pop_quantifier_scope)(smtlib2_parser_interface *parser);
 
@@ -241,7 +241,7 @@ struct smtlib2_parser_interface {
      * callback for creating terms
      * "symbol" is the identifier associated to this term,
      *          which must have been declared or defined before by a
-     *          "declare-function", "define-function", "declare-variable"
+     *          "declare-fun", "define-fun", "declare-variable"
      *          command or by a let binding
      * "sort" is the requested sort for this term. it is not NULL only when
      *        an "(as term sort)" construct is used

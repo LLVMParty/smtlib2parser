@@ -178,7 +178,7 @@ void smtlib2_abstract_parser_declare_function(smtlib2_parser_interface *p,
                                               smtlib2_sort sort)
 {
     smtlib2_abstract_parser *pp = (smtlib2_abstract_parser *)p;
-    smtlib2_abstract_parser_set_error(pp, "unimplemented (declare-function)");
+    smtlib2_abstract_parser_set_error(pp, "unimplemented (declare-fun)");
 }
 
 
@@ -187,7 +187,7 @@ void smtlib2_abstract_parser_declare_variable(smtlib2_parser_interface *p,
                                               smtlib2_sort sort)
 {
     smtlib2_abstract_parser *pp = (smtlib2_abstract_parser *)p;
-    smtlib2_abstract_parser_set_error(pp, "unimplemented (declare-variable)");
+    smtlib2_abstract_parser_set_error(pp, "unimplemented (declare_variable)");
 }
 
 
@@ -510,7 +510,7 @@ smtlib2_sort smtlib2_abstract_parser_make_sort(smtlib2_parser_interface *p,
                                                smtlib2_vector *index)
 {
     smtlib2_abstract_parser *pp = (smtlib2_abstract_parser *)p;
-    smtlib2_abstract_parser_set_error(pp, "unimplemented (make-sort)");
+    smtlib2_abstract_parser_set_error(pp, "unimplemented (make_sort)");
     return NULL;
 }
 
@@ -521,7 +521,7 @@ smtlib2_sort smtlib2_abstract_parser_make_parametric_sort(
     smtlib2_vector *tps)
 {
     smtlib2_abstract_parser *pp = (smtlib2_abstract_parser *)p;
-    smtlib2_abstract_parser_set_error(pp, "unimplemented (make-parametric-sort)");
+    smtlib2_abstract_parser_set_error(pp, "unimplemented (make_parametric_sort)");
     return NULL;
 }
 
@@ -531,7 +531,7 @@ smtlib2_sort smtlib2_abstract_parser_make_function_sort(
     smtlib2_vector *tps)
 {
     smtlib2_abstract_parser *pp = (smtlib2_abstract_parser *)p;
-    smtlib2_abstract_parser_set_error(pp, "unimplemented (make-function-sort)");
+    smtlib2_abstract_parser_set_error(pp, "unimplemented (make_function_sort)");
     return NULL;
 }
 
