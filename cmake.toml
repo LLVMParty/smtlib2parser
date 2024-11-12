@@ -37,5 +37,7 @@ headers = [
 [target.test]
 type = "executable"
 sources = [
-    "test.c"
+    "test.cpp"
 ]
+link-libraries = ["smtlib2parser"]
+compile-features = ["cxx_std_11"]

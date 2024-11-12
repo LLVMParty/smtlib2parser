@@ -64,13 +64,21 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${smtlib2parser_SOURCES})
 # Target: test
 set(test_SOURCES
 	cmake.toml
-	test.c
+	test.cpp
 )
 
 add_executable(test)
 
 target_sources(test PRIVATE ${test_SOURCES})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${test_SOURCES})
+
+target_compile_features(test PRIVATE
+	cxx_std_11
+)
+
+target_link_libraries(test PRIVATE
+	smtlib2parser
+)
 
 get_directory_property(CMKR_VS_STARTUP_PROJECT DIRECTORY ${PROJECT_SOURCE_DIR} DEFINITION VS_STARTUP_PROJECT)
 if(NOT CMKR_VS_STARTUP_PROJECT)
