@@ -64,6 +64,8 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${smtlib2parser_SOURCES})
 # Target: test
 set(test_SOURCES
 	cmake.toml
+	smtlib2cpp.cpp
+	smtlib2cpp.h
 	test.cpp
 )
 
@@ -73,7 +75,7 @@ target_sources(test PRIVATE ${test_SOURCES})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${test_SOURCES})
 
 target_compile_features(test PRIVATE
-	cxx_std_11
+	cxx_std_17
 )
 
 target_link_libraries(test PRIVATE
