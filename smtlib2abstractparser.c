@@ -57,8 +57,6 @@ void smtlib2_abstract_parser_init(smtlib2_abstract_parser *p,
     pi->set_logic = smtlib2_abstract_parser_set_logic;
     pi->declare_sort = smtlib2_abstract_parser_declare_sort;
     pi->define_sort = smtlib2_abstract_parser_define_sort;
-    pi->push_sort_param_scope = smtlib2_abstract_parser_push_sort_param_scope;
-    pi->pop_sort_param_scope = smtlib2_abstract_parser_pop_sort_param_scope;
     pi->declare_function = smtlib2_abstract_parser_declare_function;
     pi->declare_variable = smtlib2_abstract_parser_declare_variable;
     pi->define_function = smtlib2_abstract_parser_define_function;
@@ -66,6 +64,8 @@ void smtlib2_abstract_parser_init(smtlib2_abstract_parser *p,
     pi->pop = smtlib2_abstract_parser_pop;
     pi->assert_formula = smtlib2_abstract_parser_assert_formula;
     pi->check_sat = smtlib2_abstract_parser_check_sat;
+    pi->get_assignment = smtlib2_abstract_parser_get_assignment;
+    pi->get_assertions = smtlib2_abstract_parser_get_assertions;
     pi->get_unsat_core = smtlib2_abstract_parser_get_unsat_core;
     pi->get_proof = smtlib2_abstract_parser_get_proof;
     pi->set_str_option = smtlib2_abstract_parser_set_str_option;
@@ -73,24 +73,26 @@ void smtlib2_abstract_parser_init(smtlib2_abstract_parser *p,
     pi->set_rat_option = smtlib2_abstract_parser_set_rat_option;
     pi->get_info = smtlib2_abstract_parser_get_info;
     pi->set_info = smtlib2_abstract_parser_set_info;
-    pi->get_assignment = smtlib2_abstract_parser_get_assignment;
     pi->get_value = smtlib2_abstract_parser_get_value;
     pi->get_model = smtlib2_abstract_parser_get_model;
     pi->exit = smtlib2_abstract_parser_exit;
     pi->handle_error = smtlib2_abstract_parser_handle_error;
+    pi->set_internal_parsed_terms = smtlib2_abstract_parser_set_internal_parsed_terms;
     pi->push_let_scope = smtlib2_abstract_parser_push_let_scope;
     pi->pop_let_scope = smtlib2_abstract_parser_pop_let_scope;
     pi->push_quantifier_scope = smtlib2_abstract_parser_push_quantifier_scope;
     pi->pop_quantifier_scope = smtlib2_abstract_parser_pop_quantifier_scope;
+    pi->push_sort_param_scope = smtlib2_abstract_parser_push_sort_param_scope;
+    pi->pop_sort_param_scope = smtlib2_abstract_parser_pop_sort_param_scope;
     pi->make_term = smtlib2_abstract_parser_make_term;
     pi->make_number_term = smtlib2_abstract_parser_make_number_term;
+    pi->make_forall_term = smtlib2_abstract_parser_make_forall_term;
+    pi->make_exists_term = smtlib2_abstract_parser_make_exists_term;
     pi->annotate_term = smtlib2_abstract_parser_annotate_term;
     pi->define_let_binding = smtlib2_abstract_parser_define_let_binding;
     pi->make_sort = smtlib2_abstract_parser_make_sort;
     pi->make_parametric_sort = smtlib2_abstract_parser_make_parametric_sort;
     pi->make_function_sort = smtlib2_abstract_parser_make_function_sort;
-    pi->set_internal_parsed_terms =
-        smtlib2_abstract_parser_set_internal_parsed_terms;
 }
 
 
@@ -354,6 +356,13 @@ void smtlib2_abstract_parser_get_assignment(smtlib2_parser_interface *p)
 }
 
 
+void smtlib2_abstract_parser_get_assertions(smtlib2_parser_interface *p)
+{
+    smtlib2_abstract_parser *pp = (smtlib2_abstract_parser *)p;
+    smtlib2_abstract_parser_set_error(pp, "unimplemented (get-assertions)");
+}
+
+
 void smtlib2_abstract_parser_get_value(smtlib2_parser_interface *p,
                                        smtlib2_vector *terms)
 {
@@ -478,6 +487,28 @@ smtlib2_term smtlib2_abstract_parser_make_number_term(
         }
     }
     return ret;
+}
+
+
+smtlib2_term smtlib2_abstract_parser_make_forall_term(
+                                                    smtlib2_parser_interface *p,
+                                                    smtlib2_term term
+)
+{
+    smtlib2_abstract_parser *pp = (smtlib2_abstract_parser *)p;
+    smtlib2_abstract_parser_set_error(pp, "unimplemented (make_forall_term)");
+    return NULL;
+}
+
+
+smtlib2_term smtlib2_abstract_parser_make_exists_term(
+                                                    smtlib2_parser_interface *p,
+                                                    smtlib2_term term
+)
+{
+    smtlib2_abstract_parser *pp = (smtlib2_abstract_parser *)p;
+    smtlib2_abstract_parser_set_error(pp, "unimplemented (make_exists_term)");
+    return NULL;
 }
 
 

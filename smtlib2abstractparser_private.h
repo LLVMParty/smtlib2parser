@@ -125,6 +125,7 @@ void smtlib2_abstract_parser_set_info(smtlib2_parser_interface *p,
                                       const char *keyword,
                                       const char *value);
 void smtlib2_abstract_parser_get_assignment(smtlib2_parser_interface *p);
+void smtlib2_abstract_parser_get_assertions(smtlib2_parser_interface *p);
 void smtlib2_abstract_parser_get_value(smtlib2_parser_interface *p,
                                        smtlib2_vector *terms);
 void smtlib2_abstract_parser_get_model(smtlib2_parser_interface *p);
@@ -153,6 +154,14 @@ smtlib2_term smtlib2_abstract_parser_make_number_term(
                                                     const char *numval,
                                                     int width,
                                                     int base);
+smtlib2_term smtlib2_abstract_parser_make_forall_term(
+                                                    smtlib2_parser_interface *p,
+                                                    smtlib2_term term
+);
+smtlib2_term smtlib2_abstract_parser_make_exists_term(
+                                                    smtlib2_parser_interface *p,
+                                                    smtlib2_term term
+);
 
 void smtlib2_abstract_parser_annotate_term(smtlib2_parser_interface *p,
                                            smtlib2_term term,
