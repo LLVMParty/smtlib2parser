@@ -45,6 +45,16 @@ struct ParametricSort : Sort
     }
 };
 
+struct BitVecSort : Sort
+{
+    uint32_t length;
+
+    explicit BitVecSort(uint32_t length)
+        : length(length)
+    {
+    }
+};
+
 struct Function
 {
     std::string name;
@@ -62,6 +72,7 @@ struct test_parser : smtlib2_cpp_parser
     std::unordered_map<std::string, Function*> m_functions;
     std::unordered_map<std::string, int> m_declared_sorts;
     std::unordered_map<std::string, NamedSort*> m_named_sorts;
+    std::unordered_map<size_t, BitVecSort*> m_bitvec_sorts;
 
     test_parser()
     {
@@ -101,9 +112,28 @@ struct test_parser : smtlib2_cpp_parser
     {
         if (index != nullptr)
         {
-            // BitVec support
-            printf("TODO: implement %s", sortname);
-            return smtlib2_cpp_parser::make_sort(sortname, index);
+            if (strcmp(sortname, "BitVec") == 0)
+            {
+                if (smtlib2_vector_size(index) != 1)
+                {
+                    set_error("BitVec sort must have one parameter, got %zu", smtlib2_vector_size(index));
+                    return nullptr;
+                }
+                auto size = smtlib2_vector_at(index, 0);
+                auto itr = m_bitvec_sorts.find(size);
+                if (itr == m_bitvec_sorts.end())
+                {
+                    auto bvs = new BitVecSort(size);
+                    itr = m_bitvec_sorts.emplace(size, bvs).first;
+                }
+                printf("BitVec %d -> S:%p\n", (int)size, itr->second);
+                return itr->second;
+            }
+            else
+            {
+                set_error("unknown sort %s", sortname);
+                return nullptr;
+            }
         }
 
         std::string name = sortname;
