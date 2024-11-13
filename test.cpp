@@ -78,7 +78,7 @@ struct test_parser : smtlib2_cpp_parser
 
         if (!m_functions.emplace(name, func).second)
         {
-            puts("Failed to insert function!");
+            set_error("failed to declare function %s", name);
         }
     }
 
@@ -88,12 +88,12 @@ struct test_parser : smtlib2_cpp_parser
         printf("declare_sort %s %d\n", sortname, arity);
         if (m_named_sorts.count(sortname) > 0)
         {
-            printf("Sort already declared: %s\n", sortname);
+            printf("sort already declared: %s\n", sortname);
         }
 
         if (!m_declared_sorts.emplace(sortname, arity).second)
         {
-            printf("Failed to insert sort %s %d", sortname, arity);
+            set_error("failed to declare sort %s %d", sortname, arity);
         }
     }
 
@@ -113,14 +113,14 @@ struct test_parser : smtlib2_cpp_parser
             auto declared_itr = m_declared_sorts.find(name);
             if (declared_itr == m_declared_sorts.end())
             {
-                printf("Unknown sort '%s'\n", sortname);
+                set_error("unknown sort %s", sortname);
                 return nullptr;
             }
 
             auto arity = declared_itr->second;
             if (arity > 0)
             {
-                printf("illegal sort creation, expected arity 0, got %d\n", arity);
+                set_error("illegal sort creation, expected arity 0, got %d", arity);
             }
             named_itr = m_named_sorts.emplace(name, new NamedSort(name)).first;
         }
