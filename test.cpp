@@ -66,6 +66,44 @@ struct Function
     }
 };
 
+struct Term
+{
+    virtual ~Term() = default;
+};
+
+struct NumberTerm : Term
+{
+    std::string numval;
+    int width;
+    int base;
+
+    NumberTerm(std::string numval, int width, int base)
+        : numval(std::move(numval)), width(width), base(base)
+    {
+    }
+};
+
+struct VariableTerm : Term
+{
+    std::string name;
+
+    explicit VariableTerm(std::string name)
+        : name(std::move(name))
+    {
+    }
+};
+
+struct FunctionTerm : Term
+{
+    std::string name;
+    std::vector<Term*> args;
+
+    FunctionTerm(std::string name, std::vector<Term*> args)
+        : name(std::move(name)), args(std::move(args))
+    {
+    }
+};
+
 struct test_parser : smtlib2_cpp_parser
 {
     // TODO: implement scope push/pop
@@ -93,6 +131,12 @@ struct test_parser : smtlib2_cpp_parser
         }
     }
 
+    void define_function(const char* name, smtlib2_vector* params, smtlib2_sort sort, smtlib2_term term) override
+    {
+        printf("define_function %s %p %p %p\n", name, params, sort, term);
+        // TODO: implement
+    }
+
     void declare_sort(const char* sortname, int arity) override
     {
         // TODO: set parser error here correctly
@@ -106,6 +150,12 @@ struct test_parser : smtlib2_cpp_parser
         {
             set_error("failed to declare sort %s %d", sortname, arity);
         }
+    }
+
+    void define_sort(const char* sortname, smtlib2_vector* params, smtlib2_sort sort) override
+    {
+        printf("define_sort %s %p %p\n", sortname, params, sort);
+        // TODO: implement
     }
 
     smtlib2_sort make_sort(const char* sortname, smtlib2_vector* index) override
@@ -209,6 +259,59 @@ struct test_parser : smtlib2_cpp_parser
         auto param_sort = new ParametricSort(name, params);
         printf(" ) -> %p\n", param_sort);
         return param_sort;
+    }
+
+    smtlib2_term make_term(const char* symbol, smtlib2_sort sort, smtlib2_vector* index, smtlib2_vector* args) override
+    {
+        if (sort != nullptr)
+        {
+            // TODO: this happens for the "as term sort" construct
+            set_error("make_term called with non-null sort");
+            return nullptr;
+        }
+
+        if(index != nullptr)
+        {
+            // TODO: this happens for the (_ extract 3 1) construct
+            set_error("make_term called with non-null index");
+            return nullptr;
+        }
+
+        if(args == nullptr)
+        {
+            if(m_functions.count(symbol) == 0)
+            {
+                set_error("unknown variable %s", symbol);
+                return nullptr;
+            }
+            auto var_term = new VariableTerm(symbol);
+            printf("make_term(%s) [variable] -> T:%p\n", symbol, var_term);
+            return var_term;
+        }
+        else
+        {
+            printf("make_term(%s", symbol);
+            std::vector<Term*> vargs;
+            for(size_t i = 0; i < smtlib2_vector_size(args); i++)
+            {
+                auto arg = (Term*)smtlib2_vector_at(args, i);
+                printf(" T:%p", arg);
+                vargs.push_back(arg);
+            }
+            auto fn_term = new FunctionTerm(symbol, std::move(vargs));
+            printf(") -> T:%p\n", fn_term);
+            return fn_term;
+        }
+
+        printf("make_term(%s, %p, %p, %p)\n", symbol, sort, index, args);
+        return nullptr;
+    }
+
+    smtlib2_term make_number_term(const char* numval, int width, int base) override
+    {
+        auto num_term = new NumberTerm(numval, width, base);
+        printf("make_number_term('%s', %d, %d) -> T:%p\n", numval, width, base, num_term);
+        return num_term;
     }
 };
 
