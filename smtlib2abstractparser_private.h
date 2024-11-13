@@ -183,6 +183,7 @@ smtlib2_sort smtlib2_abstract_parser_make_function_sort(
 
 void smtlib2_abstract_parser_print_response(smtlib2_abstract_parser *p);
 void smtlib2_abstract_parser_reset_response(smtlib2_abstract_parser *p);
+void smtlib2_abstract_parser_set_errorv(smtlib2_abstract_parser *p, const char *fmt, va_list args);
 void smtlib2_abstract_parser_set_error(smtlib2_abstract_parser *p, const char *fmt, ...);
 
 #endif /* SMTLIB2ABSTRACTPARSER_PRIVATE_H_INCLUDED */

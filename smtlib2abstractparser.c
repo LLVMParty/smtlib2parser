@@ -641,13 +641,9 @@ void smtlib2_abstract_parser_reset_response(smtlib2_abstract_parser *p)
     smtlib2_vector_clear(p->response_data_);
 }
 
-void smtlib2_abstract_parser_set_error(smtlib2_abstract_parser *p, const char *fmt, ...)
+void smtlib2_abstract_parser_set_errorv(smtlib2_abstract_parser *p, const char *fmt, va_list args)
 {
-    va_list args;
-    char* ret;
-    va_start(args, fmt);
-    ret = smtlib2_vsprintf(fmt, args);
-    va_end(args);
+    char *ret = smtlib2_vsprintf(fmt, args);
 
     // Append the error if one already exists
     p->response_ = SMTLIB2_RESPONSE_ERROR;
@@ -663,4 +659,12 @@ void smtlib2_abstract_parser_set_error(smtlib2_abstract_parser *p, const char *f
     } else {
         p->pvt_errmsg_ = ret;
     }
+}
+
+void smtlib2_abstract_parser_set_error(smtlib2_abstract_parser *p, const char *fmt, ...)
+{
+    va_list args;   
+    va_start(args, fmt);
+    smtlib2_abstract_parser_set_errorv(p, fmt, args);
+    va_end(args);
 }

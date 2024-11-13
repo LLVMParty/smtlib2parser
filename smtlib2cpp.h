@@ -18,6 +18,8 @@ public:
     void parse(FILE* src);
 
 protected:
+    void set_error(const char* msg, ...);
+
     /**
      * callback for a "set-logic" command
      */

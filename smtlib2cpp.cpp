@@ -125,6 +125,14 @@ void smtlib2_cpp_parser::parse(FILE* src)
     printf("response: %d\n", inner->parent_.response_);
 }
 
+void smtlib2_cpp_parser::set_error(const char* msg, ...)
+{
+    va_list args;
+    va_start(args, msg);
+    smtlib2_abstract_parser_set_errorv(&inner->parent_, msg, args);
+    va_end(args);
+}
+
 void smtlib2_cpp_parser::set_logic(const char* logic)
 {
     return smtlib2_abstract_parser_set_logic(inner->pi(), logic);
