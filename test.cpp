@@ -5,12 +5,14 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <stdexcept>
 
 struct Sort
 {
     virtual ~Sort() = default;
 };
 
+// TODO: make specific classes for Int/Bool/Real?
 struct NamedSort : Sort
 {
     std::string name;
@@ -55,6 +57,7 @@ struct BitVecSort : Sort
     }
 };
 
+// TODO: what is the point of this?
 struct Function
 {
     std::string name;
@@ -74,33 +77,47 @@ struct Term
 struct NumberTerm : Term
 {
     std::string numval;
-    int width;
-    int base;
+    int width = 0;
+    int base = 0;
+    Sort* sort = nullptr;
 
-    NumberTerm(std::string numval, int width, int base)
-        : numval(std::move(numval)), width(width), base(base)
+    NumberTerm(std::string numval, int width, int base, Sort* sort)
+        : numval(std::move(numval))
+        , width(width)
+        , base(base)
     {
     }
 };
 
+// NOTE: this is equivalent to a FunctionTerm without arguments
 struct VariableTerm : Term
 {
     std::string name;
+    Sort* sort = nullptr;
 
-    explicit VariableTerm(std::string name)
+    VariableTerm(std::string name, Sort* sort)
         : name(std::move(name))
+        , sort(sort)
     {
     }
 };
 
+// TODO: use an enum here instead?
 struct FunctionTerm : Term
 {
     std::string name;
     std::vector<Term*> args;
+    std::vector<size_t> params; // used for (_ extract 1 2)
 
-    FunctionTerm(std::string name, std::vector<Term*> args)
-        : name(std::move(name)), args(std::move(args))
+    FunctionTerm(std::string name, std::vector<Term*> args, std::vector<size_t> params)
+        : name(std::move(name))
+        , args(std::move(args))
+        , params(std::move(params))
     {
+        if (this->args.empty())
+        {
+            throw std::runtime_error("FunctionTerm with no arguments");
+        }
     }
 };
 
@@ -111,6 +128,17 @@ struct test_parser : smtlib2_cpp_parser
     std::unordered_map<std::string, int> m_declared_sorts;
     std::unordered_map<std::string, NamedSort*> m_named_sorts;
     std::unordered_map<size_t, BitVecSort*> m_bitvec_sorts;
+
+    BitVecSort* mk_bitvec_sort(size_t size)
+    {
+        auto itr = m_bitvec_sorts.find(size);
+        if (itr == m_bitvec_sorts.end())
+        {
+            auto bvs = new BitVecSort(size);
+            itr = m_bitvec_sorts.emplace(size, bvs).first;
+        }
+        return itr->second;
+    }
 
     test_parser()
     {
@@ -170,14 +198,9 @@ struct test_parser : smtlib2_cpp_parser
                     return nullptr;
                 }
                 auto size = smtlib2_vector_at(index, 0);
-                auto itr = m_bitvec_sorts.find(size);
-                if (itr == m_bitvec_sorts.end())
-                {
-                    auto bvs = new BitVecSort(size);
-                    itr = m_bitvec_sorts.emplace(size, bvs).first;
-                }
-                printf("BitVec %d -> S:%p\n", (int)size, itr->second);
-                return itr->second;
+                auto bvs = mk_bitvec_sort(size);
+                printf("BitVec %d -> S:%p\n", (int)size, bvs);
+                return bvs;
             }
             else
             {
@@ -270,35 +293,61 @@ struct test_parser : smtlib2_cpp_parser
             return nullptr;
         }
 
-        if(index != nullptr)
+        std::vector<size_t> params;
+        if (index != nullptr)
         {
-            // TODO: this happens for the (_ extract 3 1) construct
-            set_error("make_term called with non-null index");
-            return nullptr;
+            // NOTE: this happens for the (_ extract 3 1) construct
+            for (size_t i = 0; i < smtlib2_vector_size(index); i++)
+            {
+                auto size = smtlib2_vector_at(index, i);
+                params.push_back(size);
+            }
         }
 
-        if(args == nullptr)
+        if (args == nullptr)
         {
-            if(m_functions.count(symbol) == 0)
+            if (m_functions.count(symbol) == 0)
             {
                 set_error("unknown variable %s", symbol);
                 return nullptr;
             }
-            auto var_term = new VariableTerm(symbol);
-            printf("make_term(%s) [variable] -> T:%p\n", symbol, var_term);
+            auto var_sort = m_functions.at(symbol)->sort;
+            auto var_term = new VariableTerm(symbol, var_sort);
+            printf("make_term(%s) [variable, S:%p] -> T:%p\n", symbol, var_sort, var_term);
             return var_term;
         }
         else
         {
-            printf("make_term(%s", symbol);
+            if (!params.empty())
+            {
+                printf("make_term((_ %s", symbol);
+                for (size_t i = 0; i < params.size(); i++)
+                {
+                    printf(" %zu", params[i]);
+                }
+                printf(")");
+            }
+            else
+            {
+                printf("make_term(%s", symbol);
+            }
             std::vector<Term*> vargs;
-            for(size_t i = 0; i < smtlib2_vector_size(args); i++)
+            for (size_t i = 0; i < smtlib2_vector_size(args); i++)
             {
                 auto arg = (Term*)smtlib2_vector_at(args, i);
                 printf(" T:%p", arg);
                 vargs.push_back(arg);
             }
-            auto fn_term = new FunctionTerm(symbol, std::move(vargs));
+            FunctionTerm* fn_term = nullptr;
+            if (!params.empty())
+            {
+                fn_term = new ParametricFunctionTerm(symbol, std::move(vargs), std::move(params));
+            }
+            else
+            {
+                fn_term = new FunctionTerm(symbol, std::move(vargs));
+            }
+            // TODO: type checking?
             printf(") -> T:%p\n", fn_term);
             return fn_term;
         }
@@ -309,7 +358,16 @@ struct test_parser : smtlib2_cpp_parser
 
     smtlib2_term make_number_term(const char* numval, int width, int base) override
     {
-        auto num_term = new NumberTerm(numval, width, base);
+        Sort* sort = nullptr;
+        if (width == 0)
+        {
+            sort = m_named_sorts.at("Int");
+        }
+        else
+        {
+            sort = mk_bitvec_sort(width);
+        }
+        auto num_term = new NumberTerm(numval, width, base, sort);
         printf("make_number_term('%s', %d, %d) -> T:%p\n", numval, width, base, num_term);
         return num_term;
     }
